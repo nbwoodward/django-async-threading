@@ -1,0 +1,4 @@
+Django==2.1.3
+django-compat==1.0.15
+pytz==2018.7
+six==1.11.0

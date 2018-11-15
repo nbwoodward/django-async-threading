@@ -1,0 +1,63 @@
+<head>
+    <link rel='stylesheet' href='https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css' />
+    <style>
+#main{max-width:1000px;margin:auto;padding:40px;}
+button{display:block}
+    </style>
+</head>
+<body>
+
+    <div id='main'>
+        <div class='row'>
+            <button id='startThread' class='btn btn-primary'>Start Thread Async</button>
+            <div style='clear:both'></div>
+        </div>
+        <div class='row'>
+            <div id='thread_msg'></div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" ></script>
+    <script type='text/javascript'>
+        $(document).ready(function(){
+            $('#startThread').on('click',function(){
+                $.ajax({
+                    type: "GET",
+                    cache: false,
+                    url: "/startThread",
+                    dataType: "json",
+                    success: function(data) {
+                        var msg = $('<div id=" '+ data.id +'">').text('Task ' + data.id + ' working')
+                        $('#thread_msg').append(msg)
+                        var i = 0;
+                        var threadInterval = setInterval(function(){
+
+                            checkTask("/checkThread/" + data.id, function(check){
+                                if(check.is_done){
+                                    msg.text('Task ' + data.id + ' succeeded.')
+                                    window.clearInterval(threadInterval)
+                                }
+                                if(++i === 10){
+                                    msg.text('Task ' + data.id + ' failed.')
+                                    window.clearInterval(threadInterval)
+                                }
+                            })
+                        },1000)
+                    }
+                })
+            })
+
+            function checkTask(url,cb){
+                $.ajax({
+                    type: "GET",
+                    cache: false,
+                    url: url,
+                    dataType: "json",
+                    success: function(data) {
+                        cb(data)
+                    }
+                })
+            }
+        })
+    </script>
+</body>
